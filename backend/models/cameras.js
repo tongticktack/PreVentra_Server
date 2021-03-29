@@ -30,19 +30,46 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false
       },
       blurring: {
-        type: DataTypes.BOOLEAN
+        type: DataTypes.BOOLEAN,
+        defalutValue: false
       },
       alarm_by_email: {
         type: DataTypes.BOOLEAN,
         allowNull: false
       },
+      /*
       alarm_criteria: {
         type: DataTypes.INTEGER,
-        allowNull: false
+        allowNull: true
+      },
+      */
+      alarm_by_mask_off: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true
+      },
+      alarm_by_sd: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true
+      },
+      alarm_by_cluster: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true
       },
       user_id: {
         type: DataTypes.INTEGER,
         allowNull: false
+      },
+      alarm_cycle: {
+        type: DataTypes.INTEGER,
+        allowNULL: true
+      },
+      mask_off_criteria: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+      },
+      sd_criteria: {
+        type: DataTypes.INTEGER,
+        allowNULL: true
       }
     }, {
       comment: "Camera and space settings"

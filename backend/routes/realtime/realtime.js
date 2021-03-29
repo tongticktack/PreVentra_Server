@@ -24,7 +24,7 @@ function processStream(stream) {
       camera_map.get(stream.camera_id).countRealtimeData(stream);
 
     // incorrect와 mask off 추합
-    stream.mask_off = stream.mask_off + stream.mask_incorrect;
+    //stream.mask_off = stream.mask_off + stream.mask_incorrect;
 
     // 이미지 데이터 base64 인코딩
     stream.img = stream.img.toString("base64");
@@ -36,10 +36,12 @@ function processStream(stream) {
 // 카메라 클래스 생성 및 초기화
 async function initCameras(req, res) {
   // 유저의 카메라 리스트 불러오기
+  console.log('user_id:', req.params)
   const list_of_cams = await models.camera.findAll({
     raw: true,
     where: {
-      user_id: req.user
+      //user_id: req.user
+      user_id: 1
     },
     order: [
       ['id', 'ASC']

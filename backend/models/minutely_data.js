@@ -23,6 +23,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false
       },
+      mask_off:{
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+      },
       n_not_keep_dist: {
         type: DataTypes.INTEGER,
         defaultValue: 0

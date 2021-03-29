@@ -91,7 +91,7 @@ export default {
       n_person: "",
       n_mask_off: "",
       n_mask_on: "",
-      socket: io.connect("http://115.145.212.100:51122"), //{ rememberTransport: false,}), //transport: ['Websocket', 'Flash Socket', 'Ajax long-polling']}),
+      socket: io.connect("http://115.145.212.100:53344"), //{ rememberTransport: false,}), //transport: ['Websocket', 'Flash Socket', 'Ajax long-polling']}),
       // socket: io.connect("http://115.145.212.100:53344"), //{ rememberTransport: false,}), //transport: ['Websocket', 'Flash Socket', 'Ajax long-polling']}),
       n_mask_unknown: "",
       n_cluster: "",
@@ -139,7 +139,7 @@ export default {
     });
 
     // axios.get("http://115.145.212.100:53344/api/realtime/init");
-    axios.get("http://115.145.212.100:51122/api/realtime/init");
+    axios.get("http://115.145.212.100:53344/api/realtime/init?user=1");
     this.socket.emit("join_room", 1);
     // this.red_sign();
   },
@@ -160,7 +160,7 @@ export default {
     handler() {
       //when browser or tab is killed
       // axios.get("http://115.145.212.100:53344/api/realtime/kill");
-      axios.get("http://115.145.212.100:51122/api/realtime/kill");
+      axios.get("http://115.145.212.100:53344/api/realtime/kill");
     },
   },
   watch: {

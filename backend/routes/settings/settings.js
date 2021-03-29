@@ -7,8 +7,8 @@ async function getCameraSettings(req, res) {
   const current_settings = await models.camera.findOne({
     raw: true,
     attributes: [
-      ['id', 'camera_id'], 'room_size', 'mode', 'distance_criteria', 'proper_n_people', 'alarm_by_email', 'alarm_criteria', 'access_path', 'blurring', 'location'
-    ],
+      ['id', 'camera_id'], 'room_size', 'mode', 'distance_criteria', 'proper_n_people', 'alarm_by_email', 'access_path', 'blurring', 'location'
+    ,'alarm_cycle', 'mask_off_criteria', 'alarm_by_mask_off', 'alarm_by_sd', 'sd_criteria', 'alarm_by_cluster'],
     where: {
       id: req.params.id
     }
@@ -25,6 +25,7 @@ async function getCameraSettings(req, res) {
 async function saveCameraSettings(req, res) {
 
   let new_settings = req.body;
+  /*
   switch (+new_settings.alarm_criteria) {
     case 1:
       new_settings.alarm_criteria = 40;
@@ -36,6 +37,7 @@ async function saveCameraSettings(req, res) {
       new_settings.alarm_criteria = 80;
       break;
   }
+  */
 
   const current_settings = await models.camera.findByPk(new_settings.camera_id, {
     attributes: ['mode']
@@ -49,10 +51,16 @@ async function saveCameraSettings(req, res) {
     distance_criteria: new_settings.distance_criteria,
     proper_n_people: new_settings.proper_n_people,
     alarm_by_email: new_settings.alarm_by_email,
-    alarm_criteria: new_settings.alarm_criteria,
+    //alarm_criteria: new_settings.alarm_criteria,
+    alarm_by_mask_off: new_settings.alarm_by_mask_off,
+    alarm_by_sd: new_settings.alarm_by_sd,
+    alarm_by_cluster: new_settings.alarm_by_cluster,
     access_path: new_settings.access_path,
     blurring: new_settings.blurring,
-    location: new_settings.location
+    location: new_settings.location,
+    alarm_cycle: new_settings.alarm_cycle,
+    mask_off_criteria: new_settings.mask_off_criteria,
+    sd_criteria: new_settings.sd_criteria
   }, {
     where: {
       id: new_settings.camera_id

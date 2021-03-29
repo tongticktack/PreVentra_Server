@@ -78,39 +78,56 @@
           <br>
           <br>
           <h3>보안 모드</h3>
-          <v-switch v-model="isisblurring" class="mx-2" label="개인정보 보호"></v-switch> <!--label = 모자이크-->
+          <v-switch v-model="isblurring" class="mx-2" label="개인정보 보호"></v-switch> <!--label = 모자이크-->
+          <h3>비디오 ON/OFF</h3>
+          <v-switch v-model="isvideo" class="mx-2" label="비디오"></v-switch>
 
           <!-- <v-divider></v-divider> -->
-          <br><br><h2>알림 설정</h2><br>
           <v-divider></v-divider><br>
           <h3>알림 설정</h3>
-          <v-switch v-model="isemail" class="mx-2" label="경고 알림"></v-switch>
-          <br>
-          <h3>알림 주기</h3>
-          <v-radio-group v-model="alarm_cycle" :mandatory="false">
-            <v-radio label="5분" value="5"></v-radio>
-            <v-radio label="3분" value="3"></v-radio>
-            <v-radio label="1분" value="1"></v-radio>
-          <br>
-          <h3>알림 기준<span class="divider">|</span>{{ milestone_display || '' }}</h3>
-            <span id = 'fivemin_above_description'>5분 이상 지속될 경우 알람이 울려요</span>
-          <v-radio-group v-model="milestone" :mandatory="false">
-            <v-radio label="심각" value="3"></v-radio>
-            <v-radio label="경계" value="2"></v-radio>
-            <!-- <v-radio label="주의" value="1"></v-radio> -->
-          </v-radio-group>
+          <v-switch v-model="isalarm" class="mx-2" label="경고 알림"></v-switch>
+          <transition name="fade" appear>
+            <span v-show="isalarm">
+              <v-switch v-model="alarm_by_mask_off" class="mx-2" label="마스크 알림"></v-switch>
+              <br>
+              마스크 알림 기준
+              <input class= "input_n_p" v-model="criteria_mask_off" type= "number" placeholder= "명">
+              <br>
+              <v-switch v-model="alarm_by_sd" class="mx-2" label="거리두기 알림"></v-switch>
+              거리두기 알림 기준
+              <input class= "input_n_p" v-model="criteria_sd" type= "number" placeholder= "명">
+              <br>
+              <v-switch v-model="alarm_by_cluster" class="mx-2" label="클러스터 알림"></v-switch>
+              <br>
+              <h3>알림 주기</h3>
+              <v-radio-group v-model="alarm_cycle" >
+                <v-radio label="1분" value=1></v-radio>
+                <v-radio label="5분" value=5></v-radio>
+                <v-radio label="3분" value=3></v-radio>
+              <br>
+              <!-- <h3>알림 기준<span class="divider">|</span>{{ milestone_display || '' }}</h3>
+                <span id = 'fivemin_above_description'>5분 이상 지속될 경우 알람이 울려요</span>
+              <v-radio-group v-model="milestone" :mandatory="true">
+                <v-radio label="심각" value=3></v-radio>
+                <v-radio label="경계" value=2></v-radio>
+                <v-radio label="주의" value="1"></v-radio>
+              </v-radio-group> -->
+            </span>
+          </transition>
           <v-btn
             class= "last_btn"
             color="primary"
+            width="100%"
             dark
             v-on:click="save_settings"
             >SAVE
           </v-btn>
+          <br>
           <v-btn
+            width="100%"
             class= "last_btn"
             color="primary"
             dark
-            right
             v-on:click="go_back"
             >Go Back
           </v-btn>
@@ -143,9 +160,19 @@ export default {
       sd_radius: '',                // 거리두기 기준 INPUT
       isblurring: '',               // 보안모드 INPUT(boolean)
       place_name: '',               // 장소이름 INPUT
-      milestone_display: '심각',
-      isemail: '',
+
+      isvideo: '',
+
+      isalarm: '',
+      alarm_by_mask_off: '',
+      criteria_mask_off : '',
+
+      alarm_by_sd: '',
+      criteria_sd : '',
+
+      alarm_by_cluster: '',
       alarm_cycle : '',
+
       milestone: '',
       places: { 
         'Lounge': 1,
@@ -172,13 +199,20 @@ export default {
       else if(this.feedback_color =='red')
         alert('적정인원이 너무 많아요.')
       else{
-        axios.post('http://115.145.212.100:51122/api/settings/camera', {distance_criteria: this.sd_radius, room_size: this.space, alarm_by_email: this.isemail,
-                                                                        alarm_criteria: +this.milestone, proper_n_people: this.proper_n_person,
+        axios.post('http://115.145.212.100:53344/api/settings/camera', {distance_criteria: this.sd_radius, room_size: this.space, alarm_by_email: this.alarm,
+                                                                        proper_n_people: this.proper_n_person,
                                                                         camera_id: this.places[this.place], access_path: this.camera_rtsp,
-                                                                        isblurring: this.isblurring, location: this.place_name})
+                                                                        blurring: this.isblurring, location: this.place_name,
+                                                                        
+                                                                        alarm_cycle: this.alarm_cycle, mask_off_criteria: this.criteria_mask_off,
+                                                                        alarm_by_mask_off: this.alarm_by_mask_off, alarm_by_sd: this.alarm_by_sd,
+                                                                        alarm_by_cluster: this.alarm_by_cluster, mask_off_criteria: this.criteria_mask_off,
+                                                                        sd_criteria: this.criteria_sd//, isvideo: this.isvideo})
+                                                                        })
         .then(res =>{
           console.log(res.data)
-          console.log("장소: " + this.place, "장소 id:" + this.places[this.place],"거리두기 기준: "+ this.sd_radius,"넓이: "+this.space,"이메일: "+ this.isemail,"알림 기준: "+ this.milestone,"적정 인원: "+ this.proper_n_person)
+          console.log("장소: " + this.place, "장소 id:" + this.places[this.place],"거리두기 기준: "+ this.sd_radius,"넓이: "+this.space,"이메일: "+ this.isalarm,"적정 인원: "+ this.proper_n_person)
+          console.log(`알림주기${this.alarm_cycle}`,`mask_off ${this.alarm_by_mask_off} ${this.criteria_mask_off}`, `sd ${this.alarm_by_sd} ${this.criteria_sd}`, `cluster ${this.alarm_by_cluster}`)
           alert('저장했습니다!');
         })
       }
@@ -191,17 +225,28 @@ export default {
       this.get_settings();
     },
     get_settings(){
-      axios.get('http://115.145.212.100:51122/api/settings/camera/'+ this.places[this.place])
+      axios.get('http://115.145.212.100:53344/api/settings/camera/'+ this.places[this.place])
         .then(res => {
-          this.place_name= res.data.location;
-          this.sd_radius= res.data.distance_criteria;
-          this.space= res.data.room_size;
-          this.isemail= res.data.alarm_by_email;
-          this.milestone= res.data.alarm_criteria;
-          this.proper_n_person= res.data.proper_n_people;
-          this.camera_rtsp= res.data.access_path;
-          this.isblurring= res.data.isblurring;
-          console.log("장소 이름" + this.place_name, "거리두기 기준" + this.sd_radius, "공간" + this.space, "알람 여부" + this.isemail, "알람 기준" + this.milestone, "정의 적정인원" + this.proper_n_person, "블러링" + this.isblurring)
+          this.place_name = res.data.location;
+          this.sd_radius = res.data.distance_criteria;
+          this.space = res.data.room_size;
+          this.isalarm = res.data.alarm_by_email;
+          this.proper_n_person = res.data.proper_n_people;
+          this.camera_rtsp = res.data.access_path;
+          this.isblurring = res.data.blurring;
+          this.alarm_cycle = res.data.alarm_cycle;
+          this.criteria_mask_off = res.data.mask_off_criteria;
+          this.isvideo = res.data.isvideo;
+
+          this.alarm_by_mask_off = res.data.alarm_by_mask_off;
+          this.alarm_by_sd = res.data.alarm_by_sd;
+          this.alarm_by_cluster = res.data.alarm_by_cluster;
+          this.criteria_mask_off = res.data.mask_off_criteria;
+          this.criteria_sd = res.data.sd_criteria;
+          console.log('데이터를 받아옵니다.')
+          console.log("장소 이름" + this.place_name, "거리두기 기준" + this.sd_radius, "공간" + this.space, "알람 여부" + this.isalarm, "정의 적정인원" + this.proper_n_person, "블러링" + this.isblurring,
+                      "알림주기 : " + this.alarm_cycle, "노마스크 기준 : "+ this.criteria_mask_off, "거리두기 기준 : ",this.criteria_sd,"노마스크 알림on/off : ",this.alarm_by_mask_off
+                      ,"거리두기 알림 on/off : ",this.alarm_by_sd, "클러스터 on/off : ",this.alarm_by_cluster)
         })
       console.log("장소!" + this.place, "장소 id :" + this.places[this.place] );
     }
@@ -234,20 +279,25 @@ export default {
       return "적정인원 범위 : (" + min + " ~ " + max +")"
     }
   },
-  watch:{
-    milestone: function(newVal){
-      var cri03 = 3;
-      var cri02 = 2;
-      var cri01 = 1;
-      if (newVal == cri01) this.milestone_display='주의'
-      else if (newVal == cri02) this.milestone_display='경계'
-      else if (newVal == cri03) this.milestone_display='심각'
-      else this.milestone_display=''
-    },
-  },
+
 }
 </script>
 <style scoped>
+/* .fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1.5s ease;
+} */
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+  transform: translateX(10px);
+  opacity: 0;
+}
 .input_place_name{
   outline: 2px solid #0055d5;
   width: 12%;

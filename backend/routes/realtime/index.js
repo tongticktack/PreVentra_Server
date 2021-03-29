@@ -18,9 +18,10 @@ router.get('/kill', killAllProcesses);
  * 클라이언트가 서버에 연결되었을 때:
  */
 io.on('connection', (socket) => {
-
+  //console.log('socket connected$', socket);
   // 영상 및 데이터를 보낼 때
   socket.on('camstream', async (stream) => {
+    //console.log('camstream connected', stream);
     let processedStream = await processStream(stream);
     socket.to("cam " + stream.camera_id).emit('stream_display', processedStream);
   });

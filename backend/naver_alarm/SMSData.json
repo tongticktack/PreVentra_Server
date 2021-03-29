@@ -1,0 +1,10 @@
+{
+  "type":"SMS",
+  "from":"01076407232",
+  "content":"Hello World", 
+  "messages":[
+    {
+        "to":"01076407232"
+    }
+  ]
+}

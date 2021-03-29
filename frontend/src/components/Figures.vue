@@ -180,7 +180,7 @@ import axios from 'axios'
     },
     methods: {
       get_settings(val){
-      axios.get('http://115.145.212.100:51122/api/settings/camera/' + val)
+      axios.get('http://115.145.212.100:53344/api/settings/camera/' + val)
         .then(res => {
           this.proper_n= res.data.proper_n_people;
           this.social_dist_hold= res.data.distance_criteria;
