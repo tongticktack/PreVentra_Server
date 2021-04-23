@@ -85,13 +85,14 @@ module.exports = () => {
       let salt = await generateSalt();
       let key = await encryptPassword(password, salt);
 
-      console.log(email, salt, key, req.body.nickname, "created");
+      console.log(email, salt, key, req.body.nickname, req.body.phone_num, "created");
 
       models.user.create({
         email: email,
         password: key,
         salt: salt,
-        nickname: req.body.nickname
+        nickname: req.body.nickname,
+        phone_num: req.body.phone_num
       });
       return done(null, true);
     });

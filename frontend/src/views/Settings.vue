@@ -46,6 +46,18 @@
           <br>
           <h3>장소 설정</h3>
           <br>
+          <input type="time" id="appt" name="appt" v-model="genesis" style="border: 1px solid"
+            min="06:00" max="24:00" required>
+          <br>
+          <small>프리벤트라 시스템 시작 시각</small>
+          <br>
+          <br>
+          <input type="time" id="appt" name="appt" v-model="apocalypse" style="border: 1px solid"
+            min="06:00" max="24:00" required>
+          <br>
+          <small>프리벤트라 시스템 종료 시각</small>
+          <br>
+          <br>
           <span>장소 이름</span><span class="divider">|</span>
           <input class= "input_place_name" v-model="place_name" type= "text" placeholder= "장소이름">
           <br>
@@ -140,7 +152,6 @@
 </template>
 <script>
 import axios from 'axios'
-
 export default {
 
   data(){
@@ -156,6 +167,8 @@ export default {
       { text: '강의실', icon: 'mdi-book', subtext: 'open source', value: "lecture_01"}
       ],
       space: '',                    // 사용자 정의 실내 공간 INPUT
+      genesis: '',
+      apocalypse: '',
       proper_n_person: '',          // 적정인원 INPUT
       sd_radius: '',                // 거리두기 기준 INPUT
       isblurring: '',               // 보안모드 INPUT(boolean)
@@ -186,7 +199,6 @@ export default {
       place: 'Lounge',
       feedback_color: 'black',
       camera_rtsp: '',
-      
     }
   },
   methods:{
@@ -199,6 +211,7 @@ export default {
       else if(this.feedback_color =='red')
         alert('적정인원이 너무 많아요.')
       else{
+        console.log(`시작 시간 끝시간 : ${this.genesis} ${this.apocalypse}`)
         axios.post('http://115.145.212.100:53344/api/settings/camera', {distance_criteria: this.sd_radius, room_size: this.space, alarm_by_email: this.alarm,
                                                                         proper_n_people: this.proper_n_person,
                                                                         camera_id: this.places[this.place], access_path: this.camera_rtsp,
@@ -207,12 +220,14 @@ export default {
                                                                         alarm_cycle: this.alarm_cycle, mask_off_criteria: this.criteria_mask_off,
                                                                         alarm_by_mask_off: this.alarm_by_mask_off, alarm_by_sd: this.alarm_by_sd,
                                                                         alarm_by_cluster: this.alarm_by_cluster, mask_off_criteria: this.criteria_mask_off,
-                                                                        sd_criteria: this.criteria_sd//, isvideo: this.isvideo})
-                                                                        })
+                                                                        sd_criteria: this.criteria_sd , isvideo: this.isvideo,
+                                                                        genesis: this.genesis, apocalypse: this.apocalypse, engine_status: this.engine_status})
+                                                                        
         .then(res =>{
           console.log(res.data)
           console.log("장소: " + this.place, "장소 id:" + this.places[this.place],"거리두기 기준: "+ this.sd_radius,"넓이: "+this.space,"이메일: "+ this.isalarm,"적정 인원: "+ this.proper_n_person)
           console.log(`알림주기${this.alarm_cycle}`,`mask_off ${this.alarm_by_mask_off} ${this.criteria_mask_off}`, `sd ${this.alarm_by_sd} ${this.criteria_sd}`, `cluster ${this.alarm_by_cluster}`)
+          console.log(`엔진 상태 ${this.engine_status}`)
           alert('저장했습니다!');
         })
       }
@@ -222,6 +237,10 @@ export default {
     },
     chg_place(_place){
       this.place=_place;
+      axios.get("http://115.145.212.100:53344/api/realtime/engine/" + this.places[this.place] )
+      .then(res => {
+        this.engine_status = res.data.engine_status;
+      });
       this.get_settings();
     },
     get_settings(){
@@ -243,10 +262,15 @@ export default {
           this.alarm_by_cluster = res.data.alarm_by_cluster;
           this.criteria_mask_off = res.data.mask_off_criteria;
           this.criteria_sd = res.data.sd_criteria;
+
+          this.genesis = res.data.genesis;
+          this.apocalypse = res.data.apocalypse;
+          this.engine_status = res.data.engine_status;
           console.log('데이터를 받아옵니다.')
           console.log("장소 이름" + this.place_name, "거리두기 기준" + this.sd_radius, "공간" + this.space, "알람 여부" + this.isalarm, "정의 적정인원" + this.proper_n_person, "블러링" + this.isblurring,
                       "알림주기 : " + this.alarm_cycle, "노마스크 기준 : "+ this.criteria_mask_off, "거리두기 기준 : ",this.criteria_sd,"노마스크 알림on/off : ",this.alarm_by_mask_off
                       ,"거리두기 알림 on/off : ",this.alarm_by_sd, "클러스터 on/off : ",this.alarm_by_cluster)
+          console.log(`엔진 상태 ${this.engine_status}`)
         })
       console.log("장소!" + this.place, "장소 id :" + this.places[this.place] );
     }

@@ -1,6 +1,6 @@
 // var axios = require('axios')
 var CryptoJS = require('crypto-js')
-// var timestamp = new Date().getTime()
+var timestamp = new Date().getTime()
 
 
   var space = " ";				// one space

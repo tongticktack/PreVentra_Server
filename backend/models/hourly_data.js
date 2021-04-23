@@ -29,6 +29,12 @@ module.exports = (sequelize, DataTypes) => {
       max_risk: {
         type: DataTypes.INTEGER
       },
+      avg_n_not_keep_dist: {
+        type: DataTypes.INTEGER
+      },
+      max_n_not_keep_dist: {
+        type: DataTypes.INTEGER
+      },
       alert_count: {
         type: DataTypes.INTEGER,
         defaultValue: 0

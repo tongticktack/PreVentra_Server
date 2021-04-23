@@ -5,6 +5,7 @@
         <input type= "text" v-model="email" placeholder="email"><br>
         <input type= "password" v-model="password" placeholder= "password"><br>
         <input type= "text" v-model="nickname" placeholder="nickname"><br>
+        <input type= "text" @keyup.enter="login" v-model="phone_num" placeholder= "phone number 010xxxx.."><br>
         <button v-on:click="signUp">Sign Up!</button>
         <router-link to= "/"><button> Go back to Login</button></router-link>
     </div>
@@ -22,7 +23,8 @@ export default {
         return {
             email: '',
             password: '',
-            nickname: ''
+            nickname: '',
+            phone_num: '',
         }
     },
     methods: {
@@ -40,10 +42,14 @@ export default {
         //      );
         // }
         signUp() {
+            if(this.email === '' || this.password === '' || this.nickname === '' || this.phone_num === ''){
+                alert('입력 내용을 확인해 주세요.')
+            }
             axios.post('api/auth/register', {
                 email: this.email,
                 password: this.password,
-                nickname: this.nickname
+                nickname: this.nickname,
+                phone_num: this.phone_num,
             }).then((res)=>{
                 this.$router.push("/");
             }).catch(function(err) {

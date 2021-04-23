@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
       salt: {
         type: DataTypes.STRING,
         allowNull: false
+      },
+      phone_num: {
+        type: DataTypes.STRING,
+        allowNull: true
       }
     }, {
       comment: "User"

@@ -1,15 +1,25 @@
 const models = require('../../models');
-
+const {
+  Op
+} = require('sequelize');
 function ttod(time) {
-  return new Promise((resolve) => {
-    resolve(time.substr(0, 10));
-  });
+  console.log(time.substr(0, 10) + "00:00:00")
+  var res = new Date(time.substr(0, 10) + " 00:00:00");
+  console.log(res, typeof res)
+  return res;
 }
 
 async function createDailyDataFromHoulryData() {
-  const max_date = await models.daily_data.max('analyzed_time')
+  let max_date = await models.daily_data.max('analyzed_time')
+  console.log(max_date)
+  if(max_date == 0){
+    var D = new Date('2020-10-20')
+    max_date = D
+  }
+  console.log(max_date)
   const hourly_data = await models.hourly_data.findAll({
     raw: true,
+    attributes: ['camera_id', 'analyzed_time', 'avg_people', 'max_people', 'avg_congestion', 'max_congestion', 'avg_risk', 'max_risk', 'avg_n_not_keep_dist', 'max_n_not_keep_dist' ,'alert_count', 'data_count', 'createdAt', 'updatedAt'],
     order: [
       ['camera_id', 'ASC'],
       ['analyzed_time', 'ASC']
@@ -20,7 +30,7 @@ async function createDailyDataFromHoulryData() {
       }
     }
   });
-
+  // console.log(hourly_data)
   let cam_id = hourly_data[0].camera_id,
     cur_date = ttod(hourly_data[0].analyzed_time),
     avg_people = 0,
@@ -30,6 +40,8 @@ async function createDailyDataFromHoulryData() {
     max_risk = 0,
     avg_congestion = 0,
     max_congestion = 0,
+    avg_n_not_keep_dist = 0,
+    max_n_not_keep_dist = 0,
     cnt_alert = 0;
 
   for (let i = 0; i < hourly_data.length; i++) {
@@ -40,12 +52,15 @@ async function createDailyDataFromHoulryData() {
         max_risk = 0;
         avg_congestion = 0;
         max_congestion = 0;
+        avg_n_not_keep_dist = 0;
+        max_n_not_keep_dist = 0;
         avg_people = 0;
         cnt_alert = 0;
       } else {
         avg_risk /= count;
         avg_congestion /= count;
         avg_people /= count;
+        avg_n_not_keep_dist /= count;
       }
 
 
@@ -61,7 +76,9 @@ async function createDailyDataFromHoulryData() {
           max_congestion: max_congestion,
           avg_people: avg_people,
           max_people: max_people,
-          alarm_count: cnt_alert,
+          avg_n_not_keep_dist: avg_n_not_keep_dist,
+          max_n_not_keep_dist: max_n_not_keep_dist,
+          alert_count: cnt_alert,
           data_count: count
         }
       });
@@ -74,6 +91,8 @@ async function createDailyDataFromHoulryData() {
       max_congestion = 0;
       avg_people = 0;
       max_people = 0;
+      avg_n_not_keep_dist = 0;
+      max_n_not_keep_dist = 0;
       cnt_alert = 0;
       count = 0;
     }
@@ -93,7 +112,12 @@ async function createDailyDataFromHoulryData() {
       max_people = hourly_data[i].max_people;
     }
 
-    cnt_alert += hourly_data[i].alarm_count
+    avg_n_not_keep_dist += hourly_data[i].data_count * hourly_data[i].avg_n_not_keep_dist;
+    if (max_n_not_keep_dist < hourly_data[i].max_n_not_keep_dist) {
+      max_n_not_keep_dist = hourly_data[i].max_n_not_keep_dist;
+    }
+
+    cnt_alert += hourly_data[i].alert_count
     count += hourly_data[i].data_count;
   }
 
@@ -104,10 +128,13 @@ async function createDailyDataFromHoulryData() {
     max_congestion = 0;
     avg_people = 0;
     cnt_alert = 0;
+    avg_n_not_keep_dist = 0;
+    max_n_not_keep_dist = 0;
   } else {
     avg_risk /= count;
     avg_congestion /= count;
     avg_people /= count;
+    avg_n_not_keep_dist /= count;
   }
 
   await models.daily_data.findOrCreate({
@@ -122,7 +149,9 @@ async function createDailyDataFromHoulryData() {
       max_congestion: max_congestion,
       avg_people: avg_people,
       max_people: max_people,
-      alarm_count: cnt_alert,
+      avg_n_not_keep_dist: avg_n_not_keep_dist,
+      max_n_not_keep_dist: max_n_not_keep_dist,
+      alert_count: cnt_alert,
       data_count: count
     }
   });

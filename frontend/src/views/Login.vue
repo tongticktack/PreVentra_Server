@@ -36,7 +36,8 @@ export default {
         alert('이메일을 입력해주세요.')
       } else if (this.password === '') {
         alert('비밀번호를 입력해주세요.')
-      } else {
+      }
+      else {
         axios.post('api/auth/login',{
           email: this.email,
           password: this.password,

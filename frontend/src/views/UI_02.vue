@@ -59,7 +59,7 @@
                   elevation="2"
                 >
                   <v-container pa-1>
-                    <v-layout row>                   
+                    <v-layout row>
                       <v-card-title primary-title class="justify-center">
                         <div>
                           <div class="h4" id="center">금주 안전지수</div>
@@ -251,7 +251,7 @@
   import RiskChart from '@/components/RiskChart'
   import axios from 'axios'
   import moment from 'moment'
-  import vueMoment from 'vue-moment'
+  // import vueMoment from 'vue-moment'
 
 
   export default {
@@ -289,7 +289,7 @@
         downSrc: require('../assets/UI_02/down-arrow.png'),
         
         // Date Picker
-        dates: ['2020-10-19', '2020-10-25'], 
+        dates: [moment().format('YYYY-MM-DD'), moment().subtract(7, 'd').format('YYYY-MM-DD')],
         menu: false,
         firstDate: '', //moment().format("YYYY-MM-DD"),
         lastDate: '', //moment().format("YYYY-MM-DD"),
@@ -385,6 +385,7 @@
     },
     created() {
       // first create page
+      console.log(this.dates, this.firstDate, this.lastDate)
       this.getCreateData()
     },
     watch: {
@@ -1209,10 +1210,12 @@
         // console.log("fillPlaces[1]: "+this.places[1].location)
       },
       getData() { // get data from backend
-        this.firstDate = moment(this.dates[0], 'YYYY-MM-DD')
-        this.lastDate = moment(this.dates[1], 'YYYY-MM-DD')
+        // this.firstDate = moment(this.dates[0], 'YYYY-MM-DD')
+        // this.lastDate = moment(this.dates[1], 'YYYY-MM-DD')
+        this.firstDate = this.dates[0]
+        this.lastDate = this.dates[1]
         this.days = this.lastDate.diff(this.firstDate, 'days')
-        console.log("getData - lastDate: " + this.lastDate.format('YYYY-MM-DD'))
+        console.log("getData - lastDate: " + this.days)
         this.date = this.firstDate.format('YYYY-MM-DD') +'/'+ this.lastDate.format('YYYY-MM-DD')+"/"+ this.times
         axios.get('http://115.145.212.100:53344/api/stats/'+ this.date)
           .then(res => {
@@ -1238,7 +1241,7 @@
         this.firstDate = moment(this.dates[0], 'YYYY-MM-DD')
         this.lastDate = moment(this.dates[1], 'YYYY-MM-DD')
         this.days = this.lastDate.diff(this.firstDate, 'days')
-        console.log("getData - lastDate: " + this.lastDate.format('YYYY-MM-DD'))
+        console.log("getData - lastDate: " + this.days)
         this.date = this.firstDate.format('YYYY-MM-DD') +'/'+ this.lastDate.format('YYYY-MM-DD')+"/"+ this.times
         axios.get('http://115.145.212.100:53344/api/stats/'+ this.date)
           .then(res => {

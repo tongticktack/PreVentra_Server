@@ -5,16 +5,18 @@ const {
 } = require('sequelize');
 
 function ttoh(time) {
-  return new Promise((resolve) => {
-    resolve(time.substr(0, 13) + ":00:00");
-  });
+  var res = new Date(time.substr(0, 13) + ":00:00")
+  return res;
 }
 
 async function createHourlyDataFromMinutelyData() {
-  const max_date = await models.hourly_data.max('analyzed_time')
+  let max_date = await models.hourly_data.max('analyzed_time')
+  // if(max_date == 0){
+  //   max_date = moment().subtract(1, 'h').format('YYYY-MM-DDTHH:00:000Z')
+  // }
   const minutely_data = await models.minutely_data.findAll({
     raw: true,
-    attributes: ['camera_id', 'analyzed_time', 'n_people', 'risk', 'congestion', 'alert_checked'],
+    attributes: ['camera_id', 'analyzed_time', 'n_people', 'risk', 'congestion', 'alert_checked', 'n_not_keep_dist'],
     order: [
       ['camera_id', 'ASC'],
       ['analyzed_time', 'ASC']
@@ -33,6 +35,8 @@ async function createHourlyDataFromMinutelyData() {
     count = 0,
     avg_risk = 0,
     max_risk = 0,
+    avg_n_not_keep_dist = 0,
+    max_n_not_keep_dist = 0,
     avg_congestion = 0,
     max_congestion = 0,
     cnt_alert = 0;
@@ -45,12 +49,15 @@ async function createHourlyDataFromMinutelyData() {
         max_risk = 0;
         avg_congestion = 0;
         max_congestion = 0;
+        avg_n_not_keep_dist = 0;
+        max_n_not_keep_dist = 0;
         avg_people = 0;
         cnt_alert = 0;
       } else {
         avg_risk /= count;
         avg_congestion /= count;
         avg_people /= count;
+        avg_n_not_keep_dist /= count;
       }
 
       //data += (cam_id + ", " + cap_date + ", " + cap_time + ", " + risk + ", " + congestion + ", " + avg_people + ", " + max_people + '\n');
@@ -67,6 +74,8 @@ async function createHourlyDataFromMinutelyData() {
           max_congestion: max_congestion,
           avg_people: avg_people,
           max_people: max_people,
+          avg_n_not_keep_dist: avg_n_not_keep_dist,
+          max_n_not_keep_dist: max_n_not_keep_dist,
           alarm_count: cnt_alert,
           data_count: count
         }
@@ -78,6 +87,8 @@ async function createHourlyDataFromMinutelyData() {
       max_risk = 0;
       avg_congestion = 0;
       max_congestion = 0;
+      avg_n_not_keep_dist = 0;
+      max_n_not_keep_dist = 0;
       avg_people = 0;
       max_people = 0;
       cnt_alert = 0;
@@ -99,6 +110,11 @@ async function createHourlyDataFromMinutelyData() {
       max_people = minutely_data[i].n_people;
     }
 
+    avg_n_not_keep_dist += minutely_data[i].n_not_keep_dist;
+    if (max_n_not_keep_dist < minutely_data[i].n_not_keep_dist) {
+      max_n_not_keep_dist = minutely_data[i].n_not_keep_dist;
+    }
+
     if (minutely_data[i].alert_checked) {
       cnt_alert += 1;
     }
@@ -110,12 +126,15 @@ async function createHourlyDataFromMinutelyData() {
     max_risk = 0;
     avg_congestion = 0;
     max_congestion = 0;
+    avg_n_not_keep_dist = 0;
+    max_n_not_keep_dist = 0;
     avg_people = 0;
     cnt_alert = 0;
   } else {
     avg_risk /= count;
     avg_congestion /= count;
     avg_people /= count;
+    avg_n_not_keep_dist /= count;
   }
 
   //data += (cam_id + ", " + cap_date + ", " + cap_time + ", " + risk + ", " + congestion + ", " + avg_people + ", " + max_people + '\n');
@@ -133,6 +152,8 @@ async function createHourlyDataFromMinutelyData() {
       max_congestion: max_congestion,
       avg_people: avg_people,
       max_people: max_people,
+      avg_n_not_keep_dist: avg_n_not_keep_dist,
+      max_n_not_keep_dist: max_n_not_keep_dist,
       alarm_count: cnt_alert,
       data_count: count
     }

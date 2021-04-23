@@ -70,12 +70,33 @@ module.exports = (sequelize, DataTypes) => {
       sd_criteria: {
         type: DataTypes.INTEGER,
         allowNULL: true
+      },
+      isvideo: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+      },
+      engine_status: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+      },
+      genesis: {
+        type: DataTypes.STRING,
+        defaultValue: "00:00",
+        allowNull: false
+      },
+      apocalypse: {
+        type: DataTypes.STRING,
+        defaultValue: "23:59",
+        allowNull: false
       }
     }, {
       comment: "Camera and space settings"
     }
   );
   camera.associate = (models) => {
+    camera.hasMany(models.cluster_data,{
+      foreignKey: 'camera_id'
+    });
     camera.hasMany(models.minutely_data, {
       foreignKey: 'camera_id'
     });

@@ -8,7 +8,7 @@ async function getCameraSettings(req, res) {
     raw: true,
     attributes: [
       ['id', 'camera_id'], 'room_size', 'mode', 'distance_criteria', 'proper_n_people', 'alarm_by_email', 'access_path', 'blurring', 'location'
-    ,'alarm_cycle', 'mask_off_criteria', 'alarm_by_mask_off', 'alarm_by_sd', 'sd_criteria', 'alarm_by_cluster'],
+    ,'alarm_cycle', 'mask_off_criteria', 'alarm_by_mask_off', 'alarm_by_sd', 'sd_criteria', 'alarm_by_cluster', 'isvideo', 'engine_status', 'genesis', 'apocalypse'],
     where: {
       id: req.params.id
     }
@@ -60,7 +60,11 @@ async function saveCameraSettings(req, res) {
     location: new_settings.location,
     alarm_cycle: new_settings.alarm_cycle,
     mask_off_criteria: new_settings.mask_off_criteria,
-    sd_criteria: new_settings.sd_criteria
+    sd_criteria: new_settings.sd_criteria,
+    isvideo: new_settings.isvideo,
+    engine_status: new_settings.engine_status,
+    genesis: new_settings.genesis,
+    apocalypse: new_settings.apocalypse
   }, {
     where: {
       id: new_settings.camera_id
