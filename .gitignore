@@ -1,4 +1,4 @@
 node_modules/
 public/
-*.py
-*.sh
+*.py/
+*.sh/
