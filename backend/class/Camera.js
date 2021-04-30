@@ -156,7 +156,7 @@ class Camera {
       this.checkAlert(this);
     }
   }
-
+  // 알람 조건을 충족하는 지 검사하는 함수
   async checkAlert() {
     let end_time = moment().subtract(1, 'minutes');
     let alert_crit = await models.camera.findByPk(this.camera_id, {
@@ -209,7 +209,7 @@ class Camera {
         sd_result = 1;
       alert_result = 10*mask_result + sd_result;
 
-
+      
       let alert_code = new Array();
       alert_code[0] = total_risk.toFixed(2);
       alert_code[1] = total_congestion.toFixed(2);
@@ -272,22 +272,13 @@ class Camera {
   alertRisk(alert_code) {
     /* Alert Data When Risk has ARISED */
     console.log(`${alert_code[4]} to ${this.room}`);
-    // this.io.to(this.room).emit('alert', alert_code[4]);
+    //프론트에 경고 보냄
+    // this.io.to(this.room).emit('alert', alert_code[4]); 
+
+    //SMS 보냄(켜놓으면 계속 돈 나감)
     //this.sendSMS(SMSData, alert_code);
-    //this.ghome(alert_code)
   }
-/*
-  ghome(alert_code){
-    alert_code_name = alert_code[4];
-    let options = {
-      scriptPath: path.join(__dirname, "../"),
-      args: [JSON.stringify({ result })]
-    };
-    PythonShell.run("ghome.py", options, function(err, alert_code_name){
-      res.status(200).join({data: JSON.parse(alert_code_name), succes:true});
-    });
-  }
-*/
+
   getEngineState() {
     return this.engine_state;
   }

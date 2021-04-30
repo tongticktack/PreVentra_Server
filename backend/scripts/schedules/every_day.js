@@ -2,24 +2,25 @@ const models = require('../../models');
 const {
   Op
 } = require('sequelize');
+
 function ttod(time) {
-  console.log(time.substr(0, 10) + "00:00:00")
+  //console.log(time.substr(0, 10) + "00:00:00")
   var res = new Date(time.substr(0, 10) + " 00:00:00");
-  console.log(res, typeof res)
+  console.log("res: ", res)
   return res;
 }
 
 async function createDailyDataFromHoulryData() {
   let max_date = await models.daily_data.max('analyzed_time')
-  console.log(max_date)
+  console.log("MAX DATE:", max_date)
+  //현재 daily_data에 튜플이 없는 경우
   if(max_date == 0){
     var D = new Date('2020-10-20')
     max_date = D
   }
-  console.log(max_date)
   const hourly_data = await models.hourly_data.findAll({
     raw: true,
-    attributes: ['camera_id', 'analyzed_time', 'avg_people', 'max_people', 'avg_congestion', 'max_congestion', 'avg_risk', 'max_risk', 'avg_n_not_keep_dist', 'max_n_not_keep_dist' ,'alert_count', 'data_count', 'createdAt', 'updatedAt'],
+    attributes: ['camera_id', 'analyzed_time', 'avg_people', 'max_people', 'avg_congestion', 'max_congestion', 'avg_risk', 'max_risk', 'avg_n_not_keep_dist', 'max_n_not_keep_dist' ,'alert_count', 'data_count'],
     order: [
       ['camera_id', 'ASC'],
       ['analyzed_time', 'ASC']
@@ -30,7 +31,9 @@ async function createDailyDataFromHoulryData() {
       }
     }
   });
-  // console.log(hourly_data)
+  for (let i = 0; i < hourly_data.length; i++){
+    console.log("analyze time: ", hourly_data[i].analyzed_time)
+  }
   let cam_id = hourly_data[0].camera_id,
     cur_date = ttod(hourly_data[0].analyzed_time),
     avg_people = 0,
@@ -84,7 +87,7 @@ async function createDailyDataFromHoulryData() {
       });
 
       cam_id = hourly_data[i].camera_id;
-      cur_hour = ttod(hourly_data[i].analyzed_time)
+      cur_date = ttod(hourly_data[i].analyzed_time)
       avg_risk = 0;
       max_risk = 0;
       avg_congestion = 0;

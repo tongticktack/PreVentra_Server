@@ -40,15 +40,6 @@ io.on('connection', (socket) => {
   socket.on('leave_room', (id) => {
     socket.leave("cam " + id);
   });
-  
-  
-  socket.on('turn_engine', (data) => {
-    if(data.engine_status == 1)
-      runProcess(data.camera_id);
-    else
-      killProcessId(data.camera_id);
-  });
-  
 
   // 클라이언트가 방 교체 요청
   socket.on('switch_room', (cur_id, next_id) => {
@@ -58,6 +49,14 @@ io.on('connection', (socket) => {
     console.log(next_id);
     // runProcess(next_id);  //next_id에 대한 정보만 보내지게 설정!
     // checkVideoProcessesById(next_id);
+  });
+
+  // 클라이언트가 엔진 끄기 or 켜기 요청
+  socket.on('turn_engine', (data) => {
+    if(data.engine_status == 1)
+      runProcess(data.camera_id);
+    else
+      killProcessId(data.camera_id);
   });
 
   // 클라이언트가 연결 종료
