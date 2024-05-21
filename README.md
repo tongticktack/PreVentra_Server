@@ -3,9 +3,15 @@
 ### Documentation
 ---
 ### 개발 언어
-
+- YOLOv3 model <- Python
 - Node.js
 - Vue.js
+
+### AI Engine
+
+- ['YOLOv3'](https://pjreddie.com/darknet/yolo/)
+- language: Python
+- fine-tuned
 
 ### Backend
 
